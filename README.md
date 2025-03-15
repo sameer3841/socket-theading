@@ -1,82 +1,74 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/ap0fYf-Z)
-# CSCI-320 Mini-Project: TCP File Transfer - Muliple Clients
+# TCP File Transfer with Multiple Clients
 
+## Overview
 
-## Setup and Installation
+I built this project to deepen my understanding of network programming and multithreading in Python. The goal was to take a simple TCP file transfer system and enhance it to handle multiple simultaneous clients. This meant implementing a multithreaded server that efficiently manages multiple file transfers at the same time.
 
-This mini-project should be forked through <a href="XXXX">GitHub classroom</a>.  If you are reading this README.md, then you have already forked this Repo and set up the project on GitHub Classroom.  You can now clone **YOUR** repo using PyCharm.  Submission entails committing and pushing your changes to your repo.
+---
 
-## 1. Introduction
+## Why I Built This
 
-This exercise is the same file transfer protocol as in the previous TCP file transfer system except that you will extend it to allow multiple simultaneous client connections.
+I've always been interested in how large-scale systems handle network communication efficiently. File transfer is a fundamental networking problem, and I wanted to explore how to improve performance by leveraging Python's threading capabilities. This project gave me hands-on experience working with sockets, concurrency, and error handling.
 
-To accomplish this task, you will convert the server you completed in the previous socketProgramming2 project into a multithreaded server capable of servicing multiple clients.
+---
 
-If you are unfamiliar with how to create a thread in Python, please refer to the following resources:
+## How It Works
 
-1. [Threading - Python Docs](https://docs.python.org/3/library/threading.html)
-2. [Multithreading in Python](https://www.geeksforgeeks.org/multithreading-python-set-1/)
-3. [An Intro to Threading in Python](https://realpython.com/intro-to-python-threading/)
+### 1. The Original Single-Client Server
 
-## 2. Protocol
+Initially, the server handled file transfers sequentially:
 
-In this mini-project, you will implement a simple protocol for file transfer over TCP.  The algorithms described below implements the following simple protocol.
+1. A client connects to the server.
+2. The server receives a message containing the file name and size.
+3. The server acknowledges with `b'go ahead'`.
+4. The client sends the file in chunks, which the server writes to disk.
+5. Once complete, the connection is closed, and the server waits for another client.
 
-<figure style="text-align:center;">
-	<img src="TCPFileTransferProtocol.png" height="600"></div>
-	<figcaption style="font-weight:bold; color:#0055ee;">Figure 1: Simple file transfer protocol.</figcaption>
-</figure>
+While this approach works, it limits performance because only one file transfer can happen at a time.
 
-## 3. The Server Algorithm (Implemented in Previous Project)
+---
 
-1. Create a socket using the `socket` function and bind it to the (ip, port) pair. **(Implemented)**
-2. Receive a message from the client using the `recv` function.
-3. Decompose the message into an 8-byte integer representing file size. The rest of the bytes should be decoded into a string representing the file name. Use `get_file_info()`.
-4. send `b'go ahead'` message to the client.
-5. Using the filename provided, open the file for writing using the `with` python statement. **NOTE: since you will be transferring a file over localhost to the same directory, it is important that you modify the filename, say by adding a *.temp* extension, to avoid overwriting the original file.** (Implemented)
-6. Inside the *with* statement, 
-	<ol type="a">
-	<li>Receive a chunk of data.</li>
-	<li>Update the number of bytes received.</li>
-	<li>Write the data to the file.</li>
-	<li>Continue to perform steps 7a-c until all bytes have been received.</li>
-	</ol>
-7. If an exception occurs, the file should be deleted. (Implemented)
-8. Close the client socket. (Implemented)
-9. Repeat steps 2 - 8. (Implemented)
+### 2. Upgrading to a Multithreaded Server
 
+To allow multiple clients to transfer files simultaneously, I modified the server to spawn a new thread for each client connection. Now, the workflow is:
 
-## 4. Implementing the Multithreaded Server
+1. The server listens for incoming connections.
+2. When a client connects, a new thread is created to handle the file transfer.
+3. The main server continues listening for other clients while file transfers occur in parallel.
 
-In our previous implementation, steps 5 through 8 above were placed in a function called `upload_file`.  Steps 1 through 9 were in a function called `start_server`
+This improves performance by handling multiple transfers concurrently instead of sequentially.
 
-Here we will need to put the client connection functionality in a separate method so that a thread of execution can be started for each client connection.
+---
 
-A possible implementation of this server is:
+## Testing
 
-1. Create a socket using the `socket` function and bind it to the (ip, port) pair. **(Same as step 1 in The Server Algorithm section above)**
-2. Listen for up to five (5) connection request. **(implemented)**
-3. Wait and accept a connection request.
-4. Create a thread that will run a function called `service_client_connection`.
-5. Start the thread.
-6. Goto step 3
+To ensure the server could handle multiple simultaneous clients, I:
+- Ran multiple client instances sending different files at the same time.
+- Introduced artificial delays to simulate real-world network latency.
+- Verified that all files were received correctly without corruption.
 
-The function `service_client_connection` implements  steps 2 through 8 in the previous server algorithm section, with steps 5 - 8 consisting of the invocation of the `upload_file` function.
+The results confirmed that the server could efficiently manage multiple clients without blocking or crashing.
 
+---
 
-## 5. Testing Your Implementation
+## Lessons Learned
 
-You can test your implementation by running the server and client on the same machine. Use the client from the previous project to test this multithreading server.  Since you know the client runs correctly, you can run multiple clients simultaneously.  To simulate this, place artificial pauses in your client that will allow you to test whether the server can handle several clients simultaneously.
+- **Threading in Python:** Managing concurrent network connections with `threading.Thread`.
+- **Error Handling:** Ensuring that incomplete file transfers don’t leave corrupted files.
+- **Socket Programming:** Deepened my understanding of TCP sockets and file streaming.
 
-## 6. Submitting This Work
+---
 
-You are required to commit and push your code to your forked repo.
+## Next Steps
 
+Some potential improvements I’d like to explore:
+- Implementing an asynchronous version using `asyncio` for even better performance.
+- Adding encryption to secure file transfers.
+- Creating a graphical client interface for ease of use.
 
-## 7. Tips
+---
 
-- Make sure to handle errors in your code.
-- Pay attention to the TODO tasks and how they are mapped to the algorithm steps above.  This will help guide you in implementing the code.
-- Read the Python documentations for the sys, os, and os.path modules along with associated examples.  Avoid Googling the answer as this will get you into the habit of reading documentaton.
+## Final Thoughts
 
-Good luck and happy coding!
+This was a fun and rewarding project that gave me hands-on experience with network programming. If you're interested in working with sockets and multithreading, this is a great starting point!
+
