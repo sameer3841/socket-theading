@@ -4,13 +4,13 @@
 
 I built this project to deepen my understanding of network programming and multithreading in Python. The goal was to take a simple TCP file transfer system and enhance it to handle multiple simultaneous clients. This meant implementing a multithreaded server that efficiently manages multiple file transfers at the same time.
 
----
+
 
 ## Why I Built This
 
 I've always been interested in how large-scale systems handle network communication efficiently. File transfer is a fundamental networking problem, and I wanted to explore how to improve performance by leveraging Python's threading capabilities. This project gave me hands-on experience working with sockets, concurrency, and error handling.
 
----
+
 
 ## How It Works
 
@@ -26,7 +26,7 @@ Initially, the server handled file transfers sequentially:
 
 While this approach works, it limits performance because only one file transfer can happen at a time.
 
----
+
 
 ### 2. Upgrading to a Multithreaded Server
 
@@ -38,7 +38,7 @@ To allow multiple clients to transfer files simultaneously, I modified the serve
 
 This improves performance by handling multiple transfers concurrently instead of sequentially.
 
----
+
 
 ## Testing
 
@@ -49,7 +49,7 @@ To ensure the server could handle multiple simultaneous clients, I:
 
 The results confirmed that the server could efficiently manage multiple clients without blocking or crashing.
 
----
+
 
 ## Lessons Learned
 
@@ -57,7 +57,7 @@ The results confirmed that the server could efficiently manage multiple clients 
 - **Error Handling:** Ensuring that incomplete file transfers don’t leave corrupted files.
 - **Socket Programming:** Deepened my understanding of TCP sockets and file streaming.
 
----
+
 
 ## Next Steps
 
@@ -66,7 +66,7 @@ Some potential improvements I’d like to explore:
 - Adding encryption to secure file transfers.
 - Creating a graphical client interface for ease of use.
 
----
+
 
 ## Final Thoughts
 
